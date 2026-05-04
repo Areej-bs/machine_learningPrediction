@@ -16,21 +16,21 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-venv \
     python3-dev \
     build-essential \
+    gcc \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
-
-# Upgrade pip
-RUN pip3 install --upgrade pip setuptools wheel
 
 # Copy backend files
 COPY backend/package*.json ./backend/
 WORKDIR /app/backend
 RUN npm install
 
-# Install Python dependencies
+# Install Python dependencies directly without upgrading pip
 COPY backend/ml/requirements.txt ./ml/
-RUN pip3 install --no-cache-dir -r ml/requirements.txt
+RUN python3 -m pip install --no-cache-dir -r ml/requirements.txt
 
 # Copy backend source
 COPY backend/ ./
