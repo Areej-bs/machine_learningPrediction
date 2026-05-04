@@ -1,0 +1,27 @@
+{
+  "name": "employee-attrition-prediction",
+  "version": "1.0.0",
+  "description": "Full-stack ML application for employee attrition prediction",
+  "main": "backend/server.js",
+  "scripts": {
+    "install-all": "npm install && cd frontend && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && node server.js",
+    "client": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node server.js"
+  },
+  "keywords": [
+    "machine-learning",
+    "employee-attrition",
+    "prediction",
+    "react",
+    "nodejs",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
