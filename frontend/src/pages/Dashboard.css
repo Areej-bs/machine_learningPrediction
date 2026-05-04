@@ -1,5 +1,6 @@
 .dashboard {
   animation: fadeIn 0.5s ease-in;
+  padding-bottom: 40px;
 }
 
 @keyframes fadeIn {
@@ -89,6 +90,7 @@
 
 .table-container {
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .best-row {
@@ -99,6 +101,17 @@
 .best-badge {
   margin-left: 8px;
   font-size: 12px;
+}
+
+/* Fix chart container heights */
+.dashboard .card {
+  position: relative;
+  min-height: 400px;
+}
+
+.dashboard .card > div {
+  position: relative;
+  height: 350px;
 }
 
 @media (max-width: 768px) {
@@ -114,5 +127,13 @@
 
   .best-model-card h3 {
     font-size: 28px;
+  }
+  
+  .dashboard .card {
+    min-height: 350px;
+  }
+  
+  .dashboard .card > div {
+    height: 300px;
   }
 }

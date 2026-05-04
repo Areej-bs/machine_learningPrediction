@@ -146,92 +146,94 @@ function Dashboard() {
           <div className="grid grid-2">
             <div className="card">
               <h3 className="card-header">Model Comparison - All Metrics</h3>
-              <Bar
-                data={{
-                  labels: metrics.comparison.map(m => m.model),
-                  datasets: [
-                    {
-                      label: 'Accuracy',
-                      data: metrics.comparison.map(m => m.accuracy * 100),
-                      backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              <div style={{ position: 'relative', height: '350px' }}>
+                <Bar
+                  data={{
+                    labels: metrics.comparison.map(m => m.model),
+                    datasets: [
+                      {
+                        label: 'Accuracy',
+                        data: metrics.comparison.map(m => m.accuracy * 100),
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                      },
+                      {
+                        label: 'F1-Score',
+                        data: metrics.comparison.map(m => m.f1 * 100),
+                        backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                      },
+                      {
+                        label: 'ROC-AUC',
+                        data: metrics.comparison.map(m => m.roc_auc * 100),
+                        backgroundColor: 'rgba(236, 72, 153, 0.7)',
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'top',
+                      },
+                      title: {
+                        display: false,
+                      },
                     },
-                    {
-                      label: 'F1-Score',
-                      data: metrics.comparison.map(m => m.f1 * 100),
-                      backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                    },
-                    {
-                      label: 'ROC-AUC',
-                      data: metrics.comparison.map(m => m.roc_auc * 100),
-                      backgroundColor: 'rgba(236, 72, 153, 0.7)',
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: 'top',
-                    },
-                    title: {
-                      display: false,
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      max: 100,
-                      ticks: {
-                        callback: function(value) {
-                          return value + '%';
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                          callback: function(value) {
+                            return value + '%';
+                          }
                         }
-                      }
+                      },
                     },
-                  },
-                }}
-                height={300}
-              />
+                  }}
+                />
+              </div>
             </div>
 
             <div className="card">
               <h3 className="card-header">F1-Score Distribution</h3>
-              <Doughnut
-                data={{
-                  labels: metrics.comparison.map(m => m.model),
-                  datasets: [
-                    {
-                      data: metrics.comparison.map(m => m.f1 * 100),
-                      backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(245, 158, 11, 0.8)',
-                        'rgba(139, 92, 246, 0.8)',
-                        'rgba(236, 72, 153, 0.8)',
-                      ],
-                      borderWidth: 2,
-                      borderColor: '#fff',
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      position: 'bottom',
-                    },
-                    tooltip: {
-                      callbacks: {
-                        label: function(context) {
-                          return context.label + ': ' + context.parsed.toFixed(2) + '%';
+              <div style={{ position: 'relative', height: '350px' }}>
+                <Doughnut
+                  data={{
+                    labels: metrics.comparison.map(m => m.model),
+                    datasets: [
+                      {
+                        data: metrics.comparison.map(m => m.f1 * 100),
+                        backgroundColor: [
+                          'rgba(59, 130, 246, 0.8)',
+                          'rgba(16, 185, 129, 0.8)',
+                          'rgba(245, 158, 11, 0.8)',
+                          'rgba(139, 92, 246, 0.8)',
+                          'rgba(236, 72, 153, 0.8)',
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff',
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'bottom',
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function(context) {
+                            return context.label + ': ' + context.parsed.toFixed(2) + '%';
+                          }
                         }
                       }
-                    }
-                  },
-                }}
-                height={300}
-              />
+                    },
+                  }}
+                />
+              </div>
             </div>
           </div>
 
