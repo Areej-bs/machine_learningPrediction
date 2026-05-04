@@ -8,29 +8,25 @@ RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
-# Stage 2: Backend with Python (using slim instead of alpine for better Python support)
-FROM node:18-slim
+# Stage 2: Backend with Python - Use Python base image with Node
+FROM python:3.11-slim
 WORKDIR /app
 
-# Install Python and system dependencies
+# Install Node.js
 RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-dev \
-    build-essential \
-    gcc \
-    g++ \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy backend files
+# Install Python dependencies first
+COPY backend/ml/requirements.txt ./ml/
+RUN pip install --no-cache-dir -r ml/requirements.txt
+
+# Copy backend files and install Node dependencies
 COPY backend/package*.json ./backend/
 WORKDIR /app/backend
 RUN npm install
-
-# Install Python dependencies directly without upgrading pip
-COPY backend/ml/requirements.txt ./ml/
-RUN python3 -m pip install --no-cache-dir -r ml/requirements.txt
 
 # Copy backend source
 COPY backend/ ./

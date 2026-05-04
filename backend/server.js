@@ -37,7 +37,9 @@ app.use((req, res, next) => {
 function runPythonScript(scriptName, args = []) {
   return new Promise((resolve, reject) => {
     const scriptPath = path.join(__dirname, 'ml', scriptName);
-    const python = spawn('python', [scriptPath, ...args]);
+    // Use python3 explicitly for better compatibility
+    const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+    const python = spawn(pythonCmd, [scriptPath, ...args]);
     
     let dataString = '';
     let errorString = '';
