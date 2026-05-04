@@ -8,12 +8,20 @@ RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
-# Stage 2: Backend with Python
-FROM node:18-alpine
+# Stage 2: Backend with Python (using slim instead of alpine for better Python support)
+FROM node:18-slim
 WORKDIR /app
 
-# Install Python and pip
-RUN apk add --no-cache python3 py3-pip
+# Install Python and system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip
+RUN pip3 install --upgrade pip setuptools wheel
 
 # Copy backend files
 COPY backend/package*.json ./backend/
