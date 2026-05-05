@@ -23,6 +23,7 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:3000',
     'https://machine-learningprediction-2.onrender.com',
+    'https://machine-learningprediction-1.onrender.com',
     /\.onrender\.com$/
   ],
   credentials: true
