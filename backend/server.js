@@ -497,7 +497,7 @@ app.get('/api/health', (req, res) => {
     success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString(),
-    version: '2.1.0',
+    version: '2.2.0',
     deployedAt: new Date().toISOString()
   });
 });
@@ -567,7 +567,8 @@ app.get('/api/test-clusters', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     message: 'Employee Attrition Prediction API',
-    version: '2.0.0',
+    version: '2.2.0',
+    deployTimestamp: new Date().toISOString(),
     endpoints: {
       train: 'POST /api/train',
       predict: 'POST /api/predict',
@@ -576,7 +577,8 @@ app.get('/', (req, res) => {
       segment: 'POST /api/segment',
       clusters: 'GET /api/clusters',
       recommend: 'POST /api/recommend',
-      health: 'GET /api/health'
+      health: 'GET /api/health',
+      status: 'GET /api/status'
     },
     note: 'All endpoints are prefixed with /api except root and health'
   });
