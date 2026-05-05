@@ -217,6 +217,187 @@ app.get('/api/feature-importance', async (req, res) => {
 });
 
 /**
+ * POST /api/segment
+ * Train clustering model for employee segmentation
+ */
+app.post('/api/segment', async (req, res) => {
+  try {
+    console.log('Starting clustering model training...');
+    
+    // Check if dataset exists
+    const dataPath = path.join(__dirname, 'data', 'WA_Fn-UseC_-HR-Employee-Attrition.csv');
+    if (!fs.existsSync(dataPath)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Dataset not found. Please place WA_Fn-UseC_-HR-Employee-Attrition.csv in backend/data/ directory'
+      });
+    }
+
+    const result = await runPythonScript('cluster.py');
+    
+    console.log('Clustering completed successfully');
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Clustering error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to train clustering model'
+    });
+  }
+});
+
+/**
+ * GET /api/clusters
+ * Get cluster profiles
+ */
+app.get('/api/clusters', async (req, res) => {
+  try {
+    const clusterPath = path.join(__dirname, 'models', 'cluster_profiles.json');
+    
+    if (!fs.existsSync(clusterPath)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cluster profiles not found. Please train the clustering model first using /api/segment endpoint'
+      });
+    }
+
+    const clusters = JSON.parse(fs.readFileSync(clusterPath, 'utf8'));
+    
+    // Also get metrics if available
+    const metricsPath = path.join(__dirname, 'models', 'clustering_metrics.json');
+    let metrics = null;
+    if (fs.existsSync(metricsPath)) {
+      metrics = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
+    }
+    
+    res.json({
+      success: true,
+      clusters: clusters,
+      metrics: metrics
+    });
+  } catch (error) {
+    console.error('Clusters error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to retrieve cluster profiles'
+    });
+  }
+});
+
+/**
+ * POST /api/recommend
+ * Get recommendations for employee retention
+ */
+app.post('/api/recommend', async (req, res) => {
+  try {
+    const employeeData = req.body;
+    
+    // Validate input
+    if (!employeeData || Object.keys(employeeData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Employee data is required'
+      });
+    }
+
+    // For now, return generic recommendations based on common factors
+    // This can be enhanced with ML-based recommendations later
+    const recommendations = generateRecommendations(employeeData);
+    
+    res.json({
+      success: true,
+      recommendations: recommendations
+    });
+  } catch (error) {
+    console.error('Recommendations error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to generate recommendations'
+    });
+  }
+});
+
+/**
+ * Helper function to generate recommendations
+ */
+function generateRecommendations(employeeData) {
+  const recommendations = [];
+  
+  // Job Satisfaction
+  if (employeeData.JobSatisfaction && employeeData.JobSatisfaction < 3) {
+    recommendations.push({
+      category: 'Job Satisfaction',
+      priority: 'High',
+      recommendation: 'Schedule one-on-one meetings to understand concerns and improve job satisfaction',
+      impact: 'High'
+    });
+  }
+  
+  // Work-Life Balance
+  if (employeeData.WorkLifeBalance && employeeData.WorkLifeBalance < 3) {
+    recommendations.push({
+      category: 'Work-Life Balance',
+      priority: 'High',
+      recommendation: 'Consider flexible work arrangements or reduced overtime',
+      impact: 'High'
+    });
+  }
+  
+  // Overtime
+  if (employeeData.OverTime === 'Yes') {
+    recommendations.push({
+      category: 'Overtime',
+      priority: 'Medium',
+      recommendation: 'Review workload distribution and consider additional resources',
+      impact: 'Medium'
+    });
+  }
+  
+  // Monthly Income
+  if (employeeData.MonthlyIncome && employeeData.MonthlyIncome < 5000) {
+    recommendations.push({
+      category: 'Compensation',
+      priority: 'High',
+      recommendation: 'Review compensation package and consider salary adjustment',
+      impact: 'High'
+    });
+  }
+  
+  // Years Since Last Promotion
+  if (employeeData.YearsSinceLastPromotion && employeeData.YearsSinceLastPromotion > 3) {
+    recommendations.push({
+      category: 'Career Growth',
+      priority: 'Medium',
+      recommendation: 'Discuss career development opportunities and promotion path',
+      impact: 'Medium'
+    });
+  }
+  
+  // Environment Satisfaction
+  if (employeeData.EnvironmentSatisfaction && employeeData.EnvironmentSatisfaction < 3) {
+    recommendations.push({
+      category: 'Work Environment',
+      priority: 'Medium',
+      recommendation: 'Improve workplace conditions and team dynamics',
+      impact: 'Medium'
+    });
+  }
+  
+  // Training
+  if (employeeData.TrainingTimesLastYear && employeeData.TrainingTimesLastYear < 2) {
+    recommendations.push({
+      category: 'Training & Development',
+      priority: 'Low',
+      recommendation: 'Provide more training and skill development opportunities',
+      impact: 'Medium'
+    });
+  }
+  
+  return recommendations;
+}
+
+/**
  * GET /api/health
  * Health check endpoint
  */
