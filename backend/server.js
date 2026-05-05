@@ -255,52 +255,6 @@ app.post('/api/segment', async (req, res) => {
 });
 
 /**
- * GET /api/clusters
- * Get cluster profiles
- */
-app.get('/api/clusters', async (req, res) => {
-  console.log('='.repeat(60));
-  console.log('GET /api/clusters endpoint HIT!');
-  console.log('='.repeat(60));
-  
-  try {
-    const clusterPath = path.join(__dirname, 'models', 'cluster_profiles.json');
-    console.log('Looking for cluster profiles at:', clusterPath);
-    console.log('File exists:', fs.existsSync(clusterPath));
-    
-    if (!fs.existsSync(clusterPath)) {
-      console.log('Cluster profiles not found');
-      return res.status(400).json({
-        success: false,
-        error: 'Cluster profiles not found. Please train the clustering model first using /api/segment endpoint'
-      });
-    }
-
-    const clusters = JSON.parse(fs.readFileSync(clusterPath, 'utf8'));
-    console.log('Clusters loaded successfully, count:', clusters.length);
-    
-    // Also get metrics if available
-    const metricsPath = path.join(__dirname, 'models', 'clustering_metrics.json');
-    let metrics = null;
-    if (fs.existsSync(metricsPath)) {
-      metrics = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
-    }
-    
-    res.json({
-      success: true,
-      clusters: clusters,
-      metrics: metrics
-    });
-  } catch (error) {
-    console.error('Clusters error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message || 'Failed to retrieve cluster profiles'
-    });
-  }
-});
-
-/**
  * POST /api/recommend
  * Get recommendations for employee retention
  */
@@ -546,6 +500,52 @@ app.get('/api/health', (req, res) => {
     version: '2.1.0',
     deployedAt: new Date().toISOString()
   });
+});
+
+/**
+ * GET /api/clusters
+ * Get cluster profiles - MOVED HERE FOR TESTING
+ */
+app.get('/api/clusters', async (req, res) => {
+  console.log('='.repeat(60));
+  console.log('GET /api/clusters endpoint HIT!');
+  console.log('='.repeat(60));
+  
+  try {
+    const clusterPath = path.join(__dirname, 'models', 'cluster_profiles.json');
+    console.log('Looking for cluster profiles at:', clusterPath);
+    console.log('File exists:', fs.existsSync(clusterPath));
+    
+    if (!fs.existsSync(clusterPath)) {
+      console.log('Cluster profiles not found');
+      return res.status(400).json({
+        success: false,
+        error: 'Cluster profiles not found. Please train the clustering model first using /api/segment endpoint'
+      });
+    }
+
+    const clusters = JSON.parse(fs.readFileSync(clusterPath, 'utf8'));
+    console.log('Clusters loaded successfully, count:', clusters.length);
+    
+    // Also get metrics if available
+    const metricsPath = path.join(__dirname, 'models', 'clustering_metrics.json');
+    let metrics = null;
+    if (fs.existsSync(metricsPath)) {
+      metrics = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
+    }
+    
+    res.json({
+      success: true,
+      clusters: clusters,
+      metrics: metrics
+    });
+  } catch (error) {
+    console.error('Clusters error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to retrieve cluster profiles'
+    });
+  }
 });
 
 /**
