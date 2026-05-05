@@ -472,6 +472,27 @@ app.use((err, req, res, next) => {
   });
 });
 
+// 404 handler - must be after all routes
+app.use((req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.path}`);
+  res.status(404).json({
+    success: false,
+    error: `Cannot ${req.method} ${req.path}`,
+    message: 'Route not found',
+    availableEndpoints: {
+      train: 'POST /api/train',
+      predict: 'POST /api/predict',
+      metrics: 'GET /api/metrics',
+      featureImportance: 'GET /api/feature-importance',
+      segment: 'POST /api/segment',
+      clusters: 'GET /api/clusters',
+      recommend: 'POST /api/recommend',
+      health: 'GET /api/health',
+      status: 'GET /api/status'
+    }
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log('='.repeat(60));
