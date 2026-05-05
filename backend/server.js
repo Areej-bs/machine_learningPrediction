@@ -222,20 +222,27 @@ app.get('/api/feature-importance', async (req, res) => {
  */
 app.post('/api/segment', async (req, res) => {
   try {
+    console.log('='.repeat(60));
     console.log('Starting clustering model training...');
+    console.log('='.repeat(60));
     
     // Check if dataset exists
     const dataPath = path.join(__dirname, 'data', 'WA_Fn-UseC_-HR-Employee-Attrition.csv');
+    console.log('Checking dataset at:', dataPath);
+    
     if (!fs.existsSync(dataPath)) {
+      console.error('Dataset not found at:', dataPath);
       return res.status(400).json({
         success: false,
         error: 'Dataset not found. Please place WA_Fn-UseC_-HR-Employee-Attrition.csv in backend/data/ directory'
       });
     }
-
+    
+    console.log('Dataset found. Running cluster.py...');
     const result = await runPythonScript('cluster.py');
     
     console.log('Clustering completed successfully');
+    console.log('Result:', JSON.stringify(result, null, 2));
     
     res.json(result);
   } catch (error) {
