@@ -259,10 +259,17 @@ app.post('/api/segment', async (req, res) => {
  * Get cluster profiles
  */
 app.get('/api/clusters', async (req, res) => {
+  console.log('='.repeat(60));
+  console.log('GET /api/clusters endpoint HIT!');
+  console.log('='.repeat(60));
+  
   try {
     const clusterPath = path.join(__dirname, 'models', 'cluster_profiles.json');
+    console.log('Looking for cluster profiles at:', clusterPath);
+    console.log('File exists:', fs.existsSync(clusterPath));
     
     if (!fs.existsSync(clusterPath)) {
+      console.log('Cluster profiles not found');
       return res.status(400).json({
         success: false,
         error: 'Cluster profiles not found. Please train the clustering model first using /api/segment endpoint'
@@ -270,6 +277,7 @@ app.get('/api/clusters', async (req, res) => {
     }
 
     const clusters = JSON.parse(fs.readFileSync(clusterPath, 'utf8'));
+    console.log('Clusters loaded successfully, count:', clusters.length);
     
     // Also get metrics if available
     const metricsPath = path.join(__dirname, 'models', 'clustering_metrics.json');
@@ -534,7 +542,21 @@ app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'Server is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: '2.1.0',
+    deployedAt: new Date().toISOString()
+  });
+});
+
+/**
+ * GET /api/test-clusters
+ * Test endpoint to verify routing works
+ */
+app.get('/api/test-clusters', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Test endpoint works! This means routing is functional.',
+    note: 'If this works but /api/clusters does not, there is a specific issue with that route.'
   });
 });
 
