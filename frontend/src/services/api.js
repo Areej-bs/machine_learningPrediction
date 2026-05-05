@@ -33,6 +33,30 @@ export const getFeatureImportance = async () => {
   return response.data;
 };
 
+// Train clustering model
+export const trainClustering = async () => {
+  const response = await api.post('/segment');
+  return response.data;
+};
+
+// Predict employee segment
+export const predictSegment = async (employeeData) => {
+  const response = await api.post('/segment/predict', employeeData);
+  return response.data;
+};
+
+// Get cluster profiles
+export const getClusters = async () => {
+  const response = await api.get('/clusters');
+  return response.data;
+};
+
+// Get recommendations
+export const getRecommendations = async (employeeData) => {
+  const response = await api.post('/recommend', employeeData);
+  return response.data;
+};
+
 // Health check
 export const healthCheck = async () => {
   const response = await api.get('/health');

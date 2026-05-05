@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Prediction from './pages/Prediction';
 import ModelInfo from './pages/ModelInfo';
+import Segmentation from './pages/Segmentation';
+import Recommendations from './pages/Recommendations';
 import './App.css';
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
               <div className="nav-links">
                 <Link to="/" className="nav-link">Dashboard</Link>
                 <Link to="/predict" className="nav-link">Prediction</Link>
+                <Link to="/segmentation" className="nav-link">Segmentation</Link>
+                <Link to="/recommendations" className="nav-link">Recommendations</Link>
                 <Link to="/model-info" className="nav-link">Model Info</Link>
               </div>
             </div>
@@ -28,6 +32,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/predict" element={<Prediction />} />
+              <Route path="/segmentation" element={<Segmentation />} />
+              <Route path="/recommendations" element={<Recommendations />} />
               <Route path="/model-info" element={<ModelInfo />} />
             </Routes>
           </div>

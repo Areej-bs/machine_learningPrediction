@@ -1,17 +1,34 @@
 # 🎯 Employee Attrition Prediction System
 
-A production-ready full-stack web application for predicting employee attrition using machine learning.
+A production-ready full-stack web application for predicting employee attrition using machine learning with **3 advanced ML models**.
 
 ## 📊 Project Overview
 
-This application implements **5 machine learning algorithms** to predict employee attrition:
+This application implements **3 comprehensive machine learning systems**:
+
+### 1. 🔮 Attrition Prediction Model
+Implements **5 machine learning algorithms** to predict employee attrition:
 1. **Logistic Regression**
 2. **Decision Tree**
 3. **Random Forest**
 4. **Gradient Boosting**
 5. **XGBoost**
 
-The system automatically selects the **best performing model** based on F1-Score and deploys it for predictions.
+The system automatically selects the **best performing model** based on F1-Score.
+
+### 2. 👥 Employee Segmentation Model
+Uses **K-Means Clustering** to segment employees into distinct groups:
+- Automatic optimal cluster detection
+- Detailed segment profiles
+- Attrition rate by segment
+- Actionable insights per group
+
+### 3. 💡 Recommendation System
+Generates **personalized HR recommendations** by combining:
+- Attrition risk prediction
+- Employee segment analysis
+- Individual characteristics
+- Feature importance analysis
 
 ## 🏗️ Architecture
 
@@ -25,13 +42,29 @@ Python ML Service (scikit-learn, XGBoost)
 
 ## 🚀 Features
 
+### Attrition Prediction
 - ✅ **5 ML Algorithms** - All implemented and compared
 - ✅ **Automatic Best Model Selection** - Based on F1-Score
 - ✅ **Real-time Predictions** - Instant employee attrition risk assessment
 - ✅ **Performance Metrics** - Accuracy, Precision, Recall, F1-Score, ROC-AUC
+- ✅ **Feature Importance** - Understand key attrition factors
+
+### Employee Segmentation
+- ✅ **K-Means Clustering** - Automatic employee grouping
+- ✅ **Segment Profiles** - Detailed characteristics per cluster
+- ✅ **Attrition Analysis** - Risk levels by segment
+- ✅ **Visual Analytics** - Interactive segment visualization
+
+### Recommendation System
+- ✅ **Personalized Recommendations** - Tailored HR actions
+- ✅ **Priority Levels** - High/Medium/Low urgency
+- ✅ **Action Plans** - Specific steps for each employee
+- ✅ **Insights Dashboard** - Key risk factors and comparisons
+
+### User Interface
 - ✅ **Interactive Dashboard** - Beautiful charts and visualizations
 - ✅ **Model Comparison** - Side-by-side algorithm performance
-- ✅ **Feature Importance** - Understand key attrition factors
+- ✅ **5 Dedicated Pages** - Dashboard, Prediction, Segmentation, Recommendations, Model Info
 
 ## 📁 Project Structure
 
@@ -112,80 +145,52 @@ npm start
 
 ## 📡 API Endpoints
 
-### POST /api/train
-Train all ML models and select the best one.
+### Attrition Prediction
+- **POST /api/train** - Train all ML models and select the best one
+- **POST /api/predict** - Make prediction for a single employee
+- **GET /api/metrics** - Get performance metrics for all models
+- **GET /api/feature-importance** - Get feature importance from best model
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Models trained successfully",
-  "bestModel": "XGBoost",
-  "metrics": {
-    "accuracy": 0.8673,
-    "precision": 0.6842,
-    "recall": 0.4615,
-    "f1": 0.5517,
-    "roc_auc": 0.8234
-  },
-  "allModels": { ... }
-}
-```
+### Employee Segmentation
+- **POST /api/segment** - Train K-Means clustering model
+- **POST /api/segment/predict** - Predict employee segment
+- **GET /api/clusters** - Get all cluster profiles
 
-### POST /api/predict
-Make prediction for a single employee.
+### Recommendations
+- **POST /api/recommend** - Get personalized HR recommendations
 
-**Request Body:**
-```json
-{
-  "Age": 35,
-  "MonthlyIncome": 5000,
-  "YearsAtCompany": 5,
-  "JobSatisfaction": 3,
-  "OverTime": "Yes",
-  ...
-}
-```
+### System
+- **GET /api/health** - Health check endpoint
 
-**Response:**
-```json
-{
-  "success": true,
-  "prediction": 1,
-  "probability": 0.7234,
-  "riskLevel": "High",
-  "model": "XGBoost"
-}
-```
-
-### GET /api/metrics
-Get performance metrics for all models.
-
-**Response:**
-```json
-{
-  "success": true,
-  "bestModel": "XGBoost",
-  "metrics": { ... },
-  "comparison": [ ... ]
-}
-```
+For detailed API documentation, see [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 
 ## 🎨 Frontend Pages
 
-### 1. Dashboard
+### 1. Dashboard (`/`)
 - Model performance overview
 - Comparison charts
 - Key metrics visualization
 - Best model indicator
 
-### 2. Prediction Page
+### 2. Prediction Page (`/predict`)
 - Employee data input form
 - Real-time prediction
 - Risk level assessment
 - Probability score
 
-### 3. Model Info Page
+### 3. Segmentation Page (`/segmentation`)
+- Train clustering model
+- View all employee segments
+- Segment characteristics
+- Attrition rates by cluster
+
+### 4. Recommendations Page (`/recommendations`)
+- Employee profile input
+- Personalized HR recommendations
+- Priority-based action plans
+- Risk insights and comparisons
+
+### 5. Model Info Page (`/model-info`)
 - Algorithm explanations
 - Feature importance
 - Model selection rationale
@@ -277,6 +282,9 @@ docker run -p 5000:5000 attrition-app
 - [ ] Deployment to cloud (AWS/Azure/GCP)
 - [ ] Real-time monitoring dashboard
 - [ ] Email alerts for high-risk employees
+- [ ] Integration with HR management systems
+- [ ] Advanced visualization dashboards
+- [ ] Export recommendations to PDF
 
 ## 🤝 Contributing
 
@@ -296,4 +304,12 @@ Built with ❤️ for academic requirements
 
 ---
 
-**Note:** This application implements ALL algorithms from the ML2.ipynb notebook and selects the best performing model for deployment. No algorithms were skipped or simplified.
+## 📚 Additional Documentation
+
+- **[ML_MODELS_DOCUMENTATION.md](ML_MODELS_DOCUMENTATION.md)** - Complete ML models documentation
+- **[QUICK_START_NEW_MODELS.md](QUICK_START_NEW_MODELS.md)** - Quick start guide for new models
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Detailed API reference
+
+---
+
+**Note:** This application implements ALL algorithms from the ML2.ipynb notebook and includes 3 complete ML systems: Attrition Prediction, Employee Segmentation, and Recommendation System.

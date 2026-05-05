@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: machine-learningprediction-2
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && cd frontend && npm install && npm run build && cd ..
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    healthCheckPath: /api/health
