@@ -308,12 +308,54 @@ app.post('/api/recommend', async (req, res) => {
       });
     }
 
-    // For now, return generic recommendations based on common factors
-    // This can be enhanced with ML-based recommendations later
-    const recommendations = generateRecommendations(employeeData);
+    console.log('Generating recommendations for employee...');
+    
+    // Get attrition prediction
+    let attritionRisk = { level: 'Unknown', probability: 0 };
+    try {
+      const modelPath = path.join(__dirname, 'models', 'best_model.pkl');
+      if (fs.existsSync(modelPath)) {
+        const predictionResult = await runPythonScript('predict.py', [JSON.stringify(employeeData)]);
+        attritionRisk = {
+          level: predictionResult.riskLevel || 'Unknown',
+          probability: predictionResult.probability || 0
+        };
+      }
+    } catch (err) {
+      console.log('Could not get attrition prediction:', err.message);
+    }
+    
+    // Get segment information
+    let segment = { label: 'Not Segmented', profile: { description: 'Employee segmentation not available' } };
+    try {
+      const clusterPath = path.join(__dirname, 'models', 'cluster_profiles.json');
+      if (fs.existsSync(clusterPath)) {
+        const clusters = JSON.parse(fs.readFileSync(clusterPath, 'utf8'));
+        // For now, assign to first cluster - this should be enhanced with actual prediction
+        if (clusters && clusters.length > 0) {
+          segment = {
+            label: clusters[0].label,
+            profile: {
+              description: clusters[0].description
+            }
+          };
+        }
+      }
+    } catch (err) {
+      console.log('Could not get segment information:', err.message);
+    }
+    
+    // Generate insights
+    const insights = generateInsights(employeeData, attritionRisk);
+    
+    // Generate recommendations
+    const recommendations = generateDetailedRecommendations(employeeData, attritionRisk);
     
     res.json({
       success: true,
+      attritionRisk: attritionRisk,
+      segment: segment,
+      insights: insights,
       recommendations: recommendations
     });
   } catch (error) {
@@ -326,78 +368,158 @@ app.post('/api/recommend', async (req, res) => {
 });
 
 /**
- * Helper function to generate recommendations
+ * Helper function to generate insights
  */
-function generateRecommendations(employeeData) {
+function generateInsights(employeeData, attritionRisk) {
+  const insights = [];
+  
+  // Risk factors insight
+  const riskFactors = [];
+  if (employeeData.JobSatisfaction < 3) riskFactors.push('Low job satisfaction');
+  if (employeeData.WorkLifeBalance < 3) riskFactors.push('Poor work-life balance');
+  if (employeeData.OverTime === 'Yes') riskFactors.push('Frequent overtime');
+  if (employeeData.YearsSinceLastPromotion > 3) riskFactors.push('No recent promotion');
+  if (employeeData.MonthlyIncome < 5000) riskFactors.push('Below average compensation');
+  
+  if (riskFactors.length > 0) {
+    insights.push({
+      title: 'Key Risk Factors',
+      content: riskFactors
+    });
+  }
+  
+  // Positive factors insight
+  const positiveFactors = [];
+  if (employeeData.JobSatisfaction >= 3) positiveFactors.push('Good job satisfaction');
+  if (employeeData.WorkLifeBalance >= 3) positiveFactors.push('Healthy work-life balance');
+  if (employeeData.TrainingTimesLastYear >= 3) positiveFactors.push('Regular training participation');
+  if (employeeData.YearsAtCompany >= 5) positiveFactors.push('Long tenure with company');
+  
+  if (positiveFactors.length > 0) {
+    insights.push({
+      title: 'Positive Indicators',
+      content: positiveFactors
+    });
+  }
+  
+  return insights;
+}
+
+/**
+ * Helper function to generate detailed recommendations
+ */
+function generateDetailedRecommendations(employeeData, attritionRisk) {
   const recommendations = [];
   
   // Job Satisfaction
   if (employeeData.JobSatisfaction && employeeData.JobSatisfaction < 3) {
     recommendations.push({
-      category: 'Job Satisfaction',
+      title: 'Improve Job Satisfaction',
+      category: 'Engagement',
       priority: 'High',
-      recommendation: 'Schedule one-on-one meetings to understand concerns and improve job satisfaction',
-      impact: 'High'
+      description: 'Employee shows low job satisfaction which is a strong predictor of attrition.',
+      actions: [
+        'Schedule one-on-one meeting to understand concerns',
+        'Review current role responsibilities and alignment with skills',
+        'Explore opportunities for more meaningful work',
+        'Consider job rotation or special projects'
+      ]
     });
   }
   
   // Work-Life Balance
   if (employeeData.WorkLifeBalance && employeeData.WorkLifeBalance < 3) {
     recommendations.push({
-      category: 'Work-Life Balance',
+      title: 'Enhance Work-Life Balance',
+      category: 'Well-being',
       priority: 'High',
-      recommendation: 'Consider flexible work arrangements or reduced overtime',
-      impact: 'High'
+      description: 'Poor work-life balance can lead to burnout and turnover.',
+      actions: [
+        'Implement flexible work arrangements',
+        'Review workload and redistribute if necessary',
+        'Encourage use of vacation days',
+        'Promote wellness programs'
+      ]
     });
   }
   
   // Overtime
   if (employeeData.OverTime === 'Yes') {
     recommendations.push({
-      category: 'Overtime',
+      title: 'Address Overtime Concerns',
+      category: 'Workload',
       priority: 'Medium',
-      recommendation: 'Review workload distribution and consider additional resources',
-      impact: 'Medium'
+      description: 'Frequent overtime may indicate understaffing or inefficient processes.',
+      actions: [
+        'Analyze workload distribution across team',
+        'Consider hiring additional resources',
+        'Review and optimize work processes',
+        'Set clear boundaries for work hours'
+      ]
     });
   }
   
-  // Monthly Income
+  // Compensation
   if (employeeData.MonthlyIncome && employeeData.MonthlyIncome < 5000) {
     recommendations.push({
+      title: 'Review Compensation Package',
       category: 'Compensation',
       priority: 'High',
-      recommendation: 'Review compensation package and consider salary adjustment',
-      impact: 'High'
+      description: 'Compensation appears below market average for the role.',
+      actions: [
+        'Conduct market salary analysis',
+        'Consider salary adjustment or bonus',
+        'Review benefits package',
+        'Discuss performance-based incentives'
+      ]
     });
   }
   
-  // Years Since Last Promotion
+  // Career Growth
   if (employeeData.YearsSinceLastPromotion && employeeData.YearsSinceLastPromotion > 3) {
     recommendations.push({
-      category: 'Career Growth',
+      title: 'Career Development Opportunity',
+      category: 'Growth',
       priority: 'Medium',
-      recommendation: 'Discuss career development opportunities and promotion path',
-      impact: 'Medium'
-    });
-  }
-  
-  // Environment Satisfaction
-  if (employeeData.EnvironmentSatisfaction && employeeData.EnvironmentSatisfaction < 3) {
-    recommendations.push({
-      category: 'Work Environment',
-      priority: 'Medium',
-      recommendation: 'Improve workplace conditions and team dynamics',
-      impact: 'Medium'
+      description: 'Employee has not been promoted recently, which may affect motivation.',
+      actions: [
+        'Discuss career goals and aspirations',
+        'Create clear promotion pathway',
+        'Provide stretch assignments',
+        'Offer leadership development programs'
+      ]
     });
   }
   
   // Training
   if (employeeData.TrainingTimesLastYear && employeeData.TrainingTimesLastYear < 2) {
     recommendations.push({
-      category: 'Training & Development',
+      title: 'Increase Training Opportunities',
+      category: 'Development',
       priority: 'Low',
-      recommendation: 'Provide more training and skill development opportunities',
-      impact: 'Medium'
+      description: 'Limited training may hinder skill development and career growth.',
+      actions: [
+        'Identify skill gaps and training needs',
+        'Enroll in relevant courses or certifications',
+        'Provide mentorship opportunities',
+        'Allocate budget for professional development'
+      ]
+    });
+  }
+  
+  // Environment Satisfaction
+  if (employeeData.EnvironmentSatisfaction && employeeData.EnvironmentSatisfaction < 3) {
+    recommendations.push({
+      title: 'Improve Work Environment',
+      category: 'Environment',
+      priority: 'Medium',
+      description: 'Low environment satisfaction affects productivity and retention.',
+      actions: [
+        'Gather feedback on workplace conditions',
+        'Improve physical workspace if needed',
+        'Foster positive team culture',
+        'Address any interpersonal conflicts'
+      ]
     });
   }
   
