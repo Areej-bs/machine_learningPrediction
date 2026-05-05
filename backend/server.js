@@ -433,7 +433,33 @@ app.get('/', (req, res) => {
       clusters: 'GET /api/clusters',
       recommend: 'POST /api/recommend',
       health: 'GET /api/health'
+    },
+    note: 'All endpoints are prefixed with /api except root and health'
+  });
+});
+
+/**
+ * GET /api/status
+ * Debug endpoint to check server status
+ */
+app.get('/api/status', (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      routes.push({
+        path: middleware.route.path,
+        methods: Object.keys(middleware.route.methods)
+      });
     }
+  });
+  
+  res.json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    registeredRoutes: routes,
+    environment: process.env.NODE_ENV || 'development',
+    port: PORT
   });
 });
 
